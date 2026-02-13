@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tengo algo que decirte...</title>
+    <title>Request: Relationship Status Update</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap');
 
@@ -14,68 +14,67 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: radial-gradient(circle, #fbc2eb 0%, #a6c1ee 100%);
+            background: radial-gradient(circle, #ffe3ec 0%, #ffb3c1 100%);
             font-family: 'Quicksand', sans-serif;
             overflow: hidden;
             transition: background 1s ease;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.98);
-            padding: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
             border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(214, 51, 132, 0.2);
             text-align: center;
-            max-width: 500px;
+            max-width: 550px;
             width: 90%;
             z-index: 10;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #ff85a1;
         }
 
         h1 {
             font-family: 'Dancing Script', cursive;
             color: #d63384;
-            font-size: 3rem;
-            margin-bottom: 15px;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
         }
 
         #sub-text {
-            color: #555;
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-            min-height: 60px;
-            line-height: 1.5;
+            color: #444;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            min-height: 80px;
         }
 
         .buttons {
             display: flex;
             justify-content: center;
-            gap: 25px;
+            gap: 20px;
             align-items: center;
             position: relative;
         }
 
         button {
-            padding: 18px 40px;
-            font-size: 1.2rem;
+            padding: 15px 35px;
+            font-size: 1.1rem;
             border: none;
-            border-radius: 60px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.3s ease, background-color 0.3s;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         #btn-yes {
             background-color: #ff4d6d;
             color: white;
-            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
-            z-index: 999; /* Siempre arriba */
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+            z-index: 9999;
         }
 
         #btn-no {
             background-color: #8e9aaf;
             color: white;
-            transition: all 0.2s ease;
+            z-index: 1;
         }
 
         .success-message {
@@ -84,24 +83,32 @@
         }
 
         @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
+            0% { transform: scale(0.3); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
+        .status-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #d63384;
+            margin-bottom: 15px;
+            display: block;
+        }
+
         .heart-icon {
-            font-size: 70px;
+            font-size: 60px;
             color: #ff4d6d;
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="card" id="main-container">
+    <div class="card">
         <div id="ask-section">
+            <span class="status-code">GET /status/heartbeat HTTP/1.1</span>
             <div class="heart-icon">💝</div>
             <h1 id="main-title">¿Quieres ser mi novia?</h1>
-            <p id="sub-text">Llevo mucho tiempo queriendo decirte esto...</p>
+            <p id="sub-text">Iniciando protocolo de conexión emocional...</p>
             
             <div class="buttons">
                 <button id="btn-yes" onclick="celebrate()">¡SÍ! ❤️</button>
@@ -110,66 +117,71 @@
         </div>
 
         <div id="success-section" class="success-message">
-            <div class="heart-icon">💖</div>
-            <h1>¡SÍÍÍ! Sabía que eras tú</h1>
-            <p>Has hecho que mi servidor (y mi corazón) funcionen al 100%.</p>
-            <p><b>¡Te quiero!</b></p>
+            <div class="heart-icon">🚀</div>
+            <h1 style="font-size: 2rem;">¡DEPLOY EXITOSO!</h1>
+            <p>Has aceptado la solicitud de este <b>Ingeniero</b>.</p>
+            <p>Status: <b>Connection Established 💖</b></p>
+            <p>Prometo darte el mejor soporte técnico y amor infinito.</p>
         </div>
     </div>
 
     <script>
-        let currentPhase = 0;
+        let phase = 0;
         const btnNo = document.getElementById('btn-no');
         const btnYes = document.getElementById('btn-yes');
         const subText = document.getElementById('sub-text');
         const mainTitle = document.getElementById('main-title');
 
         const phases = [
-            { t: "¿Segura? Piénsalo bien...", b: "No" },
-            { t: "¿De verdad me vas a decir que no? 🥺", b: "Muy segura" },
-            { t: "Pero mira que somos lindos juntos... ✨", b: "Aún así, no" },
-            { t: "Te prometo ver todas las carreras de F1 contigo (o dejarte el control)", b: "No me convences" },
-            { t: "¡ERROR! Opción inválida. Intente de nuevo.", b: "Intentar No de nuevo" },
-            { t: "Voy a llorar... 😭", b: "No llores" },
-            { t: "Si dices que sí, programo lo que quieras.", b: "No sé programar" },
-            { t: "¡Mira, un gatito! 🐱 (No mires el botón)", b: "Igual no" },
-            { t: "Ya me estoy quedando sin ideas...", b: "Pobre..." },
-            { t: "¡El botón de SI es mucho más bonito!", b: "Meh" },
-            { t: "Anda, di que sí... por favor 🙏", b: "No" },
-            { t: "¡Última oportunidad antes del bloqueo total!", b: "¡Que no!" }
+            "¿Segura? Piénsalo otra vez...",
+            "¡Pero si soy un Ingeniero de calidad! 👨‍💻",
+            "¿De verdad me vas a dar un 404? 🥺",
+            "Prometo no hablarte de código todo el día...",
+            "Te daré mantenimiento preventivo al corazón 🛠️",
+            "¿Estás rechazando mi Pull Request? 💔",
+            "¡Mira esa carita que tengo! 👉👈",
+            "Si dices que sí, te haré una app solo para ti.",
+            "¡Error! No se puede ejecutar el comando 'No'.",
+            "Me estoy poniendo triste... 😭",
+            "¿Y si te compro comida? 🍕",
+            "¡Tengo un MSI nuevo para jugar juntos! 💻",
+            "¡Todavía puedes cambiar de opinión!",
+            "El botón 'No' está perdiendo señal...",
+            "¡Ya casi ni lo puedes ver!",
+            "¿Aún sigues intentando decir que no?",
+            "Eres persistente, ¡me encanta eso de ti!",
+            "Segura Segura Segura mi amorsito? 🥺",
+            "Segura Segura Segura mi amorsito? (Último aviso) ⚠️",
+            "¡Ya no hay vuelta atrás! ❤️"
         ];
 
         function handleNo() {
-            if (currentPhase < phases.length) {
-                const data = phases[currentPhase];
+            if (phase < phases.length) {
+                // Actualizar texto
+                subText.innerText = phases[phase];
                 
-                // Actualizar textos
-                subText.innerText = data.t;
-                btnNo.innerText = data.b;
-
-                // Agrandar el botón SÍ significativamente
-                let yesScale = 1 + (currentPhase * 0.4); 
+                // El botón SI crece exponencialmente
+                let yesScale = 1 + (phase * 0.6);
                 btnYes.style.transform = `scale(${yesScale})`;
 
-                // Encoger el botón NO
-                let noScale = 1 - (currentPhase * 0.05);
+                // El botón NO se encoge y se mueve
+                let noScale = 1 - (phase * 0.045);
                 btnNo.style.transform = `scale(${noScale})`;
-
-                // Mover el botón NO a un lugar aleatorio para que tenga que buscarlo
+                
                 const x = Math.random() * (window.innerWidth - btnNo.offsetWidth - 100);
                 const y = Math.random() * (window.innerHeight - btnNo.offsetHeight - 100);
                 btnNo.style.position = 'fixed';
                 btnNo.style.left = x + 'px';
                 btnNo.style.top = y + 'px';
 
-                currentPhase++;
+                phase++;
             } else {
-                // Fase final: Desaparece el No y el SI ocupa la pantalla
+                // Desaparición final del No
                 btnNo.style.display = 'none';
-                mainTitle.innerText = "¡YA NO HAY MÁS NO!";
-                subText.innerText = "El sistema ha decidido que tu única opción es ser feliz conmigo. ❤️";
-                btnYes.style.transform = "scale(20)"; // Casi cubre todo
-                btnYes.style.position = "relative";
+                mainTitle.innerText = "¡SÍ DEFINITIVO!";
+                subText.innerText = "He bloqueado todos los puertos. Solo queda el acceso vía AMOR. ❤️";
+                btnYes.style.transform = "scale(25)";
+                btnYes.style.opacity = "0.9";
             }
         }
 
@@ -178,9 +190,32 @@
             document.getElementById('success-section').style.display = 'block';
             document.body.style.background = "#ff4d6d";
             
-            // Reajustar el botón si creció demasiado
-            btnYes.style.transform = "scale(1)";
+            // Efecto Confeti Visual simple
+            for(let i=0; i<50; i++) {
+                createHeart();
+            }
         }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'fixed';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '-20px';
+            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            heart.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+
+        // CSS dinámico para la caída de corazones
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fall {
+                to { transform: translateY(105vh) rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
