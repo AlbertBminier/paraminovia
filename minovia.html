@@ -17,30 +17,33 @@
             background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
             font-family: 'Quicksand', sans-serif;
             overflow: hidden;
+            transition: background 0.5s;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
-            max-width: 400px;
+            max-width: 450px;
             width: 90%;
             z-index: 10;
+            transition: all 0.3s ease;
         }
 
         h1 {
             font-family: 'Dancing Script', cursive;
             color: #d63384;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
         }
 
-        p {
-            color: #555;
+        #sub-text {
+            color: #666;
             font-size: 1.1rem;
             margin-bottom: 30px;
+            min-height: 3em;
         }
 
         .buttons {
@@ -48,47 +51,53 @@
             justify-content: center;
             gap: 20px;
             align-items: center;
-            position: relative;
-            min-height: 60px;
+            min-height: 100px;
         }
 
         button {
-            padding: 12px 30px;
-            font-size: 1rem;
+            padding: 15px 35px;
+            font-size: 1.1rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.3s;
             font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         #btn-yes {
             background-color: #ff4d6d;
             color: white;
             box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
-        }
-
-        #btn-yes:hover {
-            transform: scale(1.1);
-            background-color: #ff758f;
+            z-index: 100;
         }
 
         #btn-no {
-            background-color: #6c757d;
+            background-color: #adb5bd;
             color: white;
             position: relative;
         }
 
-        /* Estilo para el mensaje final */
         .success-message {
             display: none;
-            color: #d63384;
+            animation: fadeIn 1s;
         }
 
         .heart {
             color: #ff4d6d;
-            font-size: 50px;
+            font-size: 60px;
             margin-bottom: 10px;
+            animation: heartbeat 1.2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -98,67 +107,75 @@
         <div id="content">
             <div class="heart">❤</div>
             <h1 id="question">¿Quieres ser mi novia?</h1>
-            <p id="sub-text">Me harías el ingeniero más feliz del mundo.</p>
+            <p id="sub-text">Piénsalo bien, ¡es una oferta limitada! 😉</p>
             
-            <div class="buttons" id="button-container">
-                <button id="btn-yes" onclick="celebrate()">¡SÍ!</button>
-                <button id="btn-no" onmouseover="moveButton()" onclick="moveButton()">No</button>
+            <div class="buttons">
+                <button id="btn-yes" onclick="celebrate()">¡SÍ! 😍</button>
+                <button id="btn-no" onmouseover="handleNo()" onclick="handleNo()">No</button>
             </div>
         </div>
 
         <div id="final-message" class="success-message">
             <div class="heart">💖</div>
-            <h1>¡Sabía que dirías que sí!</h1>
-            <p>Prometo siempre darte soporte técnico y mucho amor.</p>
+            <h1>¡SABÍA QUE DIRÍAS QUE SÍ!</h1>
+            <p>Has tomado la mejor decisión de tu vida. <br> <b>Te quiero mucho.</b></p>
         </div>
     </div>
 
     <script>
-        let clickCount = 0;
-        const messages = [
-            "¿Estás segura? 🥺",
-            "Piénsalo bien...",
-            "¡No acepto un no! 😤",
-            "¿De verdad? 💔",
-            "Mira el otro botón mejor 👉",
-            "Última oportunidad...",
-            "¡Ya casi no puedes darme al No!"
+        let phase = 0;
+        const btnNo = document.getElementById('btn-no');
+        const btnYes = document.getElementById('btn-yes');
+        const subText = document.getElementById('sub-text');
+
+        const phases = [
+            { text: "¿Estás segura? Piénsalo otra vez... 🧐", btn: "No", yesScale: 1.2 },
+            { text: "¡Oye! Ese botón está defectuoso, prueba el otro. 🛠️", btn: "¿Segura?", yesScale: 1.5 },
+            { text: "Me vas a romper el corazoncito... 💔", btn: "Aún no", yesScale: 2.0 },
+            { text: "Si dices que sí, te compro lo que quieras. 🍫", btn: "Tal vez no", yesScale: 3.0 },
+            { text: "¡El botón de 'No' se está escapando! 🏃‍♂️", btn: "Nop", yesScale: 4.5 },
+            { text: "¡ERROR 404: 'No' no encontrado! ⚠️", btn: "...", yesScale: 6.5 },
+            { text: "Ya es casi imposible darle al no, ¿verdad? 😏", btn: "Casi no", yesScale: 9.0 },
+            { text: "¡Ríndete! Solo queda el SÍ. ❤️", btn: "Bye bye No", yesScale: 15.0 }
         ];
 
-        function moveButton() {
-            const btnNo = document.getElementById('btn-no');
-            const btnYes = document.getElementById('btn-yes');
-            const question = document.getElementById('question');
-            
-            clickCount++;
+        function handleNo() {
+            if (phase < phases.length) {
+                const current = phases[phase];
+                
+                // Actualizar textos
+                subText.innerText = current.text;
+                btnNo.innerText = current.btn;
+                
+                // Agrandar el botón SÍ
+                btnYes.style.transform = `scale(${current.yesScale})`;
+                
+                // Reducir el botón NO
+                let noScale = 1 - (phase * 0.1);
+                btnNo.style.transform = `scale(${noScale})`;
 
-            // Cambiar el texto del botón "No" aleatoriamente
-            if (clickCount < messages.length) {
-                btnNo.innerText = messages[clickCount];
+                // Mover el botón NO a una posición aleatoria (salta)
+                const x = Math.random() * (window.innerWidth - btnNo.offsetWidth - 100);
+                const y = Math.random() * (window.innerHeight - btnNo.offsetHeight - 100);
+                
+                btnNo.style.position = 'fixed';
+                btnNo.style.left = x + 'px';
+                btnNo.style.top = y + 'px';
+
+                phase++;
             } else {
-                // Después de varios intentos, el botón No desaparece
+                // Desaparecer el botón No finalmente
                 btnNo.style.display = 'none';
+                subText.innerText = "¡Ya no tienes escapatoria! Presiona el botón gigante. ✨";
             }
-
-            // Hacer el botón "Sí" más grande cada vez que intentan decir que no
-            let currentSize = 1 + (clickCount * 0.15);
-            btnYes.style.transform = `scale(${currentSize})`;
-
-            // Mover el botón "No" a una posición aleatoria
-            const x = Math.random() * (window.innerWidth - btnNo.offsetWidth - 50);
-            const y = Math.random() * (window.innerHeight - btnNo.offsetHeight - 50);
-            
-            btnNo.style.position = 'fixed';
-            btnNo.style.left = x + 'px';
-            btnNo.style.top = y + 'px';
         }
 
         function celebrate() {
             document.getElementById('content').style.display = 'none';
             document.getElementById('final-message').style.display = 'block';
+            document.body.style.background = "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)";
             
-            // Efecto simple de confeti en consola o podrías añadir uno real
-            console.log("¡Felicidades! Acceso concedido al corazón.");
+            // Si quieres un toque extra, puedes lanzar confeti aquí
         }
     </script>
 </body>
